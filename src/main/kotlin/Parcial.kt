@@ -66,17 +66,16 @@ object PersonaDivertida : PreferenciaVacaciones{
     override fun aceptaLugarTuristico(lugar: Lugar): Boolean = lugar.esDivertido()
 }
 
-//O recibe la persona y accede a su preferencia, casualmente espero que tenga tranquila o divertida...
-//      acceder al valor de preferencia en la persona me parece que acopla
-
-//O almaceno la preferencia en el strategy y desde ahi la cambio
+//No me gusta pero tiene un flag interno que alterna para cambiar entre tranquila y divertida
+//El tema es que no reutilizo el object PersonaTranquila ni PersonaDivertida sino que copypasteo
+//la misma logica que hacen esos strategys (si o si lo hago porque tengo que devolver Boolean)
 class PersonaTranquilaODivertida(val persona : Persona) : PreferenciaVacaciones{
+    var flagAlternante : Boolean = true             //true para tranquila, false para divertida
+
     override fun aceptaLugarTuristico(lugar: Lugar): Boolean {
-        if(persona.preferenciaVacaciones is PersonaTranquila) {
-            persona.preferenciaVacaciones = PersonaDivertida
-        }else if(persona.preferenciaVacaciones is PersonaDivertida) {
-            persona.preferenciaVacaciones = PersonaTranquila
-        }
+        val preferenciaActual = if (flagAlternante) lugar.esTranquilo() else lugar.esDivertido()
+        flagAlternante = !flagAlternante            //Cambia para la proxima vez
+        return preferenciaActual
     }
 }
 class PersonaCombinado(var criterios : MutableList<PreferenciaVacaciones>) : PreferenciaVacaciones{
