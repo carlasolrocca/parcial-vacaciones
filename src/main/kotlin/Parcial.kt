@@ -41,3 +41,35 @@ class Balneario(val metrosPlaya : Double, val marPeligroso : Boolean, val tieneP
 }
 // *** FIN PUNTO 1 ***
 
+// *** PUNTO 2 ***
+class Persona(val nombre : String, val dni : Int, val presupuestoMaximo : Double){
+    var preferenciaVacaciones : PreferenciaVacaciones = PersonaTranquila()  //Por defecto, es PersonaTranquila
+
+}
+
+// Strategy para la preferencia por el lugar para vacacionar
+interface PreferenciaVacaciones{
+    fun aceptaLugarTuristico(lugar : Lugar): Boolean
+}
+class PersonaTranquila : PreferenciaVacaciones{
+    override fun aceptaLugarTuristico(lugar: Lugar): Boolean {
+        TODO("Not yet implemented")
+    }
+
+}
+class PersonaDivertida : PreferenciaVacaciones{
+    override fun aceptaLugarTuristico(lugar: Lugar): Boolean {
+        TODO("Not yet implemented")
+    }
+}
+class PersonaTranquilaODivertida : PreferenciaVacaciones{
+    override fun aceptaLugarTuristico(lugar: Lugar): Boolean {
+        TODO("Not yet implemented")
+    }
+}
+class PersonaCombinado : PreferenciaVacaciones{
+    override fun aceptaLugarTuristico(lugar: Lugar): Boolean {
+        TODO("Not yet implemented")
+    }
+}
+// *** FIN PUNTO 2 ***
