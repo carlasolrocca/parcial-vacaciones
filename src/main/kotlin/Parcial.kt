@@ -51,7 +51,7 @@ class Balneario(val metrosPlaya : Double, val marPeligroso : Boolean, val tieneP
 // *** PUNTO 2 ***
 //El presupuesto podria ser var y ser atributo? No se que me conviene mas
 class Persona(val nombre : String, val dni : Int, val presupuestoMaximo : Double){
-    var preferenciaVacaciones : PreferenciaVacaciones = PersonaTranquila()  //Por defecto, es PersonaTranquila
+    var preferenciaVacaciones : PreferenciaVacaciones = PersonaTranquila  //Por defecto, es PersonaTranquila
 
 }
 
@@ -59,23 +59,27 @@ class Persona(val nombre : String, val dni : Int, val presupuestoMaximo : Double
 interface PreferenciaVacaciones{
     fun aceptaLugarTuristico(lugar : Lugar): Boolean
 }
-class PersonaTranquila : PreferenciaVacaciones{
-    override fun aceptaLugarTuristico(lugar: Lugar): Boolean =
+object PersonaTranquila : PreferenciaVacaciones{
+    override fun aceptaLugarTuristico(lugar: Lugar): Boolean = lugar.esTranquilo()
+}
+object PersonaDivertida : PreferenciaVacaciones{
+    override fun aceptaLugarTuristico(lugar: Lugar): Boolean = lugar.esDivertido()
+}
 
-}
-class PersonaDivertida : PreferenciaVacaciones{
+//O recibe la persona y accede a su preferencia, casualmente espero que tenga tranquila o divertida...
+//      acceder al valor de preferencia en la persona me parece que acopla
+
+//O almaceno la preferencia en el strategy y desde ahi la cambio
+class PersonaTranquilaODivertida(val persona : Persona) : PreferenciaVacaciones{
     override fun aceptaLugarTuristico(lugar: Lugar): Boolean {
-        TODO("Not yet implemented")
+        if(persona.preferenciaVacaciones is PersonaTranquila) {
+            persona.preferenciaVacaciones = PersonaDivertida
+        }else if(persona.preferenciaVacaciones is PersonaDivertida) {
+            persona.preferenciaVacaciones = PersonaTranquila
+        }
     }
 }
-class PersonaTranquilaODivertida : PreferenciaVacaciones{
-    override fun aceptaLugarTuristico(lugar: Lugar): Boolean {
-        TODO("Not yet implemented")
-    }
-}
-class PersonaCombinado : PreferenciaVacaciones{
-    override fun aceptaLugarTuristico(lugar: Lugar): Boolean {
-        TODO("Not yet implemented")
-    }
+class PersonaCombinado(var criterios : MutableList<PreferenciaVacaciones>) : PreferenciaVacaciones{
+    override fun aceptaLugarTuristico(lugar: Lugar): Boolean = criterios.any { it.aceptaLugarTuristico(lugar) }
 }
 // *** FIN PUNTO 2 ***
