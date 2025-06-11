@@ -82,3 +82,13 @@ class PersonaCombinado(var criterios : MutableList<PreferenciaVacaciones>) : Pre
     override fun aceptaLugarTuristico(lugar: Lugar): Boolean = criterios.any { it.aceptaLugarTuristico(lugar) }
 }
 // *** FIN PUNTO 2 ***
+
+// *** PUNTO 3 ***
+class Tour
+    (val fechaSalida : LocalDate,
+     val cantidadPersonasRequerida : Int,
+     val lugaresTuristicos : MutableList<Lugar>,
+     val montoPagar : Double)
+{ var personasEnTour : MutableList<Persona> = mutableListOf()
+}
+// *** FIN PUNTO 3 ***
