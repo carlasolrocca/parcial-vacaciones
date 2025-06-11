@@ -91,23 +91,43 @@ class PersonaCombinado(var criterios : MutableList<PreferenciaVacaciones>) : Pre
 // *** PUNTO 3 ***
 class Tour(
     val fechaSalida : LocalDate,
-    val cantidadPersonasRequerida : Int,
+    var cantidadPersonasRequerida : Int,
     val lugaresTuristicos : MutableList<Lugar>,
     val montoPagar : Double)
 {
-    var personasEnTour : MutableList<Persona> = mutableListOf() //hubiera hecho un map de persona+preferencia pero no se
+    var participantesDelTour : MutableList<Persona> = mutableListOf() //hubiera hecho un map de persona+preferencia pero no se
 
+    fun agregarParticipante(persona : Persona) {
+        participantesDelTour.add(persona)
+        cantidadPersonasRequerida -= 1
+        if(cantidadPersonasRequerida == 0) {
+            print("No entra nadie mas")
+        }
+    }
 }
 
+//La Casa de Turismo está a cargo del Armado de Tours
 class CasaTurismo(){
-    var toursDisponibles : MutableList<Tour> = mutableListOf()  //La Casa de Turismo conoce a varios Tours
-
-    //Recibe a la persona y le devuelve un tour que: cumpla con el presupuesto y que tenga lugares que acepta
-    //No uso .minByOrNull porque no quiero que tire valor null si no hay tour que cumpla
-    fun tourBaratoDisponible(persona : Persona) : Tour = toursLocacionesAceptadas(persona).minBy { it.montoPagar }
+    var toursDisponibles : MutableList<Tour> = mutableListOf()          //La Casa de Turismo conoce a varios Tours
+    var listaEsperaPersonas : MutableList<Persona> = mutableListOf()   //Lista de espera de personas que no pudieron acceder a un tour
 
     //Auxiliar que me devuelve una lista de Tours cuyos lugares (todos) son aceptados por la persona
     fun toursLocacionesAceptadas(persona : Persona) : List<Tour> = toursDisponibles.filter{ tour -> persona.aceptaLugaresTour(tour) }
+
+    //Recibe a la persona y devuelve un tour que: cumpla con el presupuesto (menor valor posible) y que tenga lugares que acepta
+    fun tourBaratoDisponible(persona : Persona) : Tour? = toursLocacionesAceptadas(persona).minByOrNull { it.montoPagar }
+
+    private fun agregarPersonaListaEspera(persona: Persona) = listaEsperaPersonas.add(persona)
+
+    //Si no hay tour disponible para la persona, la agrega a la lista de espera
+    fun asignaTourAPersona(persona: Persona){
+        val tourQueCumple = tourBaratoDisponible(persona)
+        if(tourQueCumple == null){
+            agregarPersonaListaEspera(persona)                 //Si es null, va a lista espera
+        }else{
+            tourQueCumple.agregarParticipante(persona)      //Si no es null, lo agrega al tour
+        }
+    }
 
 }
 // *** FIN PUNTO 3 ***
