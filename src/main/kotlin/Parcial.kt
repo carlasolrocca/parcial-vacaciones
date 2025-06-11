@@ -15,6 +15,8 @@ abstract class Lugar(){
     fun cantidadParLetras() : Boolean = (nombre.length % 2) == 0
 
     abstract fun condicionDivertido() : Boolean
+
+    abstract fun esTranquilo() : Boolean        //PUNTO 2
 }
 
 //Las atraccionesTuristicas podria ser var porque podria tener un metodo para agregar/sacar
@@ -24,6 +26,8 @@ class Ciudad(var atraccionesTuristicas : MutableList<String>, val decibeles : In
     fun cantidadAtracciones() : Boolean = atraccionesTuristicas.size > 3
 
     fun cantidadHabitantes() : Boolean = habitantes > 100000
+
+    override fun esTranquilo(): Boolean = decibeles < 20  //PUNTO 2
 }
 
 class Pueblo(val extensionKm : Double, val fechaFundacion : LocalDate, val provincia : String) : Lugar() {
@@ -33,15 +37,19 @@ class Pueblo(val extensionKm : Double, val fechaFundacion : LocalDate, val provi
 
     fun esDelLitoral() : Boolean = provincia in provinciasDelLitoral
     fun anioFundacion() : Boolean = fechaFundacion.isBefore(LocalDate.of(1800,1,1))
+
+    override fun esTranquilo(): Boolean = provincia == "La Pampa" //PUNTO 2
 }
 
 class Balneario(val metrosPlaya : Double, val marPeligroso : Boolean, val tienePeatonal : Boolean) : Lugar() {
     override fun condicionDivertido(): Boolean = metrosPlayaDivertida() && marPeligroso
     fun metrosPlayaDivertida() : Boolean = metrosPlaya > 300
+    override fun esTranquilo(): Boolean = !tienePeatonal  //PUNTO 2
 }
 // *** FIN PUNTO 1 ***
 
 // *** PUNTO 2 ***
+//El presupuesto podria ser var y ser atributo? No se que me conviene mas
 class Persona(val nombre : String, val dni : Int, val presupuestoMaximo : Double){
     var preferenciaVacaciones : PreferenciaVacaciones = PersonaTranquila()  //Por defecto, es PersonaTranquila
 
@@ -52,9 +60,7 @@ interface PreferenciaVacaciones{
     fun aceptaLugarTuristico(lugar : Lugar): Boolean
 }
 class PersonaTranquila : PreferenciaVacaciones{
-    override fun aceptaLugarTuristico(lugar: Lugar): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun aceptaLugarTuristico(lugar: Lugar): Boolean =
 
 }
 class PersonaDivertida : PreferenciaVacaciones{
