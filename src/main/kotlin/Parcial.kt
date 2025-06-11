@@ -53,6 +53,11 @@ class Balneario(val metrosPlaya : Double, val marPeligroso : Boolean, val tieneP
 class Persona(val nombre : String, val dni : Int, val presupuestoMaximo : Double){
     var preferenciaVacaciones : PreferenciaVacaciones = PersonaTranquila  //Por defecto, es PersonaTranquila
 
+    //Metodo que responde si acepta UN lugar para vacacionar
+    fun aceptaLugar(lugar: Lugar): Boolean = preferenciaVacaciones.aceptaLugarTuristico(lugar)
+
+    //Metodo que responde si acepta TODOS los lugares de un tour
+    fun aceptaLugaresTour(tour : Tour) : Boolean = tour.lugaresTuristicos.all { aceptaLugar(it) }
 }
 
 // Strategy para la preferencia por el lugar para vacacionar
@@ -84,11 +89,25 @@ class PersonaCombinado(var criterios : MutableList<PreferenciaVacaciones>) : Pre
 // *** FIN PUNTO 2 ***
 
 // *** PUNTO 3 ***
-class Tour
-    (val fechaSalida : LocalDate,
-     val cantidadPersonasRequerida : Int,
-     val lugaresTuristicos : MutableList<Lugar>,
-     val montoPagar : Double)
-{ var personasEnTour : MutableList<Persona> = mutableListOf()
+class Tour(
+    val fechaSalida : LocalDate,
+    val cantidadPersonasRequerida : Int,
+    val lugaresTuristicos : MutableList<Lugar>,
+    val montoPagar : Double)
+{
+    var personasEnTour : MutableList<Persona> = mutableListOf() //hubiera hecho un map de persona+preferencia pero no se
+
+}
+
+class CasaTurismo(){
+    var toursDisponibles : MutableList<Tour> = mutableListOf()  //La Casa de Turismo conoce a varios Tours
+
+    //Recibe a la persona y le devuelve un tour que: cumpla con el presupuesto y que tenga lugares que acepta
+    //No uso .minByOrNull porque no quiero que tire valor null si no hay tour que cumpla
+    fun tourBaratoDisponible(persona : Persona) : Tour = toursLocacionesAceptadas(persona).minBy { it.montoPagar }
+
+    //Auxiliar que me devuelve una lista de Tours cuyos lugares (todos) son aceptados por la persona
+    fun toursLocacionesAceptadas(persona : Persona) : List<Tour> = toursDisponibles.filter{ tour -> persona.aceptaLugaresTour(tour) }
+
 }
 // *** FIN PUNTO 3 ***
