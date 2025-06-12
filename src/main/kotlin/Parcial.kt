@@ -50,7 +50,7 @@ class Balneario(val metrosPlaya : Double, val marPeligroso : Boolean, val tieneP
 
 // *** PUNTO 2 ***
 //El presupuesto podria ser var y ser atributo? No se que me conviene mas
-class Persona(val nombre : String, val dni : Int, val presupuestoMaximo : Double){
+class Persona(val nombre : String, val dni : Int, val presupuestoMaximo : Double, val email : String){
     var preferenciaVacaciones : PreferenciaVacaciones = PersonaTranquila  //Por defecto, es PersonaTranquila
 
     //Metodo que responde si acepta UN lugar para vacacionar
@@ -180,10 +180,18 @@ class Administrador(){
 
 //Observers
 interface TourObserver {
-    fun acciones(){} //Sin definir aun
+    fun accionesTourConfirmado(persona : Persona, tour : Tour){} //Sin definir aun
 }
 
-class NotificacionMail() : TourObserver {}
+class NotificacionMail(val mailSender : MailSender) : TourObserver {
+    override fun accionesTourConfirmado(persona : Persona, tour : Tour) {
+        mailSender.sendMail(
+            Mail(from = "agenciaviajesDodain@gmail.com",
+                to = "",
+                subject = "Confirmación de Tour",
+                content = "Su tour ha sido confirmado. Detalles: ...")
+    }
+}
 class NotificacionAFIP() : TourObserver {}
 class CambioPreferencia() : TourObserver {}
 
