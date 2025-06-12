@@ -166,6 +166,16 @@ class Administrador(){
     fun confirmarTour(){
         listaObservers.forEach { observer -> observer.acciones() }
     }
+
+    //Un Admin debe poder agregar/eliminar gente de un Tour
+   //(sin importar limite de participantes o preferencias/presupuesto de la persona)
+    fun agregarPersonaAlTour(persona : Persona, tour : Tour){
+        tour.participantesDelTour.add(persona)      //O conoce la estructura interna del Tour y bypassea la validacion
+    }                                               //O yo deberia agregar algo a la validacion que chequee por Admin (se puede?)
+    fun eliminarPersonaDelTour(persona : Persona, tour : Tour){
+        tour.participantesDelTour.remove(persona)
+    }
+
 }
 
 
