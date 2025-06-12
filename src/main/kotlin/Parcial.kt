@@ -151,9 +151,26 @@ class CasaTurismo(){
 * */
 
 // *** PUNTO 4 ***
+//Para mi como el Admin confirma el Tour es el que tiene la lista de Observers
 class Administrador(){
+    var listaObservers : MutableList<TourObserver> = mutableListOf()
 
-    fun confirmarTour(){}
+    fun agregarObserver(observer: TourObserver) {
+        listaObservers.add(observer)
+    }
+
+    fun eliminarObserver(observer: TourObserver) {
+        listaObservers.remove(observer)
+    }
+
+    fun confirmarTour(){
+        listaObservers.forEach { observer -> observer.acciones() }
+    }
+}
+
+
+interface TourObserver {
+    fun acciones(){} //Sin definir aun
 }
 
 // *** FIN PUNTO 4 ***
