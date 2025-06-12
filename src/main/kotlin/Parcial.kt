@@ -100,7 +100,7 @@ class Tour(
 
     fun agregarParticipante(persona : Persona) {
         if (limiteParticipantesAlcanzado()) {
-            administradorDelTour.confirmarTour(persona : Persona, this)            //PUNTO 4
+            administradorDelTour.confirmarTour(persona, this)            //PUNTO 4
         }else{
             participantesDelTour.add(persona)
         }
@@ -200,7 +200,13 @@ class NotificacionMail(val mailSender : MailSender) : TourObserver {
 }
 class NotificacionAFIP(val informeAfip : InformeAFIP) : TourObserver {
     override fun accionesTourConfirmado(persona : Persona, tour : Tour) {
-
+        informeAfip.sendInforme(
+            Informe(
+                from = "agenciaviajesDodain@gmail.com",
+                to = "informes@arca.com.ar",
+                codigos = tour.lugaresTuristicos.map { it.codigoLugar },
+                documentos = tour.participantesDelTour.map { it.dni })
+        )
     }
 }
 class CambioPreferencia() : TourObserver {
