@@ -100,7 +100,7 @@ class Tour(
 
     fun agregarParticipante(persona : Persona) {
         if (limiteParticipantesAlcanzado()) {
-            administradorDelTour.confirmarTour()            //PUNTO 4
+            administradorDelTour.confirmarTour(persona : Persona, this)            //PUNTO 4
         }else{
             participantesDelTour.add(persona)
         }
@@ -108,6 +108,7 @@ class Tour(
 
     fun limiteParticipantesAlcanzado() : Boolean = participantesDelTour.size == cantidadPersonasRequerida
     fun estaConfirmado() : Boolean = limiteParticipantesAlcanzado()
+    fun fechaLimitePago() : LocalDate = fechaSalida.minusDays(30)
 }
 
 //La Casa de Turismo está a cargo del Armado de Tours
@@ -153,8 +154,8 @@ class CasaTurismo(){
 
 // *** PUNTO 4 ***
 //Como el Admin es quien confirma el Tour debe tener la lista de Observers
-class Administrador(){
-    var listaObservers : MutableList<TourObserver> = mutableListOf()
+class Administrador() {
+    var listaObservers: MutableList<TourObserver> = mutableListOf()
 
     fun agregarObserver(observer: TourObserver) {
         listaObservers.add(observer)
@@ -164,8 +165,9 @@ class Administrador(){
         listaObservers.remove(observer)
     }
 
-    fun confirmarTour(){
-        listaObservers.forEach { observer -> observer.acciones() }
+    //Hay algo con las dependencias que no me gusta, pero no se como resolverlo
+    fun confirmarTour(persona : Persona, tour : Tour) {
+        listaObservers.forEach { observer -> observer.accionesTourConfirmado(persona, tour) }
     }
 
     //Un Admin debe poder agregar/eliminar gente de un Tour
@@ -187,13 +189,23 @@ class NotificacionMail(val mailSender : MailSender) : TourObserver {
     override fun accionesTourConfirmado(persona : Persona, tour : Tour) {
         mailSender.sendMail(
             Mail(from = "agenciaviajesDodain@gmail.com",
-                to = "",
-                subject = "Confirmación de Tour",
-                content = "Su tour ha sido confirmado. Detalles: ...")
+                to = persona.email,
+                subject = "Confirmación de Tour!!!",
+                content = "Le informamos que su tour ha sido confirmado!" +
+                        "El tour comenzara el dia ${tour.fechaSalida} y tiene un costo de ${tour.montoPagar}." +
+                        "Tenes la posibilidad de pagar hasta el día ${tour.fechaLimitePago()}"+
+                        "Los destinos a recorrer son: ${tour.lugaresTuristicos}.")
+        )
     }
 }
-class NotificacionAFIP() : TourObserver {}
-class CambioPreferencia() : TourObserver {}
+class NotificacionAFIP(val informeAfip : InformeAFIP) : TourObserver {
+    override fun accionesTourConfirmado(persona : Persona, tour : Tour) {
+
+    }
+}
+class CambioPreferencia() : TourObserver {
+    override fun accionesTourConfirmado(persona : Persona, tour : Tour) {}
+}
 
 interface MailSender {
     fun sendMail(mail: Mail)
