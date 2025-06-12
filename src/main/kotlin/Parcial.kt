@@ -96,7 +96,7 @@ class Tour(
     val montoPagar : Double)
 {
     var participantesDelTour : MutableList<Persona> = mutableListOf() //hubiera hecho un map de persona+preferencia pero no se
-    lateinit var administradorDelTour : Administrador       //C/Tour tiene que tener su propio Admin, eso entiendo yo
+    lateinit var administradorDelTour : Administrador               //C/Tour tiene que tener su propio Admin, eso entiendo yo
 
     fun agregarParticipante(persona : Persona) {
         if (limiteParticipantesAlcanzado()) {
@@ -111,10 +111,11 @@ class Tour(
 
 //La Casa de Turismo está a cargo del Armado de Tours
 class CasaTurismo(){
-    var toursDisponibles : MutableList<Tour> = mutableListOf()          //La Casa de Turismo conoce a varios Tours
-    var listaEsperaPersonas : MutableList<Persona> = mutableListOf()   //Lista de espera de personas que no pudieron acceder a un tour
+    var toursDisponibles : MutableList<Tour> = mutableListOf()           //La Casa de Turismo conoce a varios Tours
+    var listaEsperaPersonas : MutableList<Persona> = mutableListOf()    //Lista de espera de personas que no pudieron acceder a un tour
+    var listaPersonas : MutableList<Persona> = mutableListOf()          //Lista de personas que quieren acceder a un tour
 
-    //Auxiliar que me devuelve una lista de Tours cuyos lugares (todos) son aceptados por la persona
+    //Auxiliar que me devuelve una lista de Tours cuyos lugares (TODOS) son aceptados por la persona
     fun toursLocacionesAceptadas(persona : Persona) : List<Tour> = toursDisponibles.filter{ tour -> persona.aceptaLugaresTour(tour) }
 
     //Recibe a la persona y devuelve UN tour que: cumpla con el presupuesto (menor valor posible) y que tenga lugares que acepta
@@ -122,13 +123,16 @@ class CasaTurismo(){
 
     private fun agregarPersonaListaEspera(persona: Persona) = listaEsperaPersonas.add(persona)
 
-    //Si no hay tour disponible para la persona, la agrega a la lista de espera
-    fun asignaTourAPersona(persona: Persona){
-        val tourQueCumple = tourBaratoDisponible(persona)
-        if(tourQueCumple == null){
-            agregarPersonaListaEspera(persona)
-        }else{
-            tourQueCumple.agregarParticipante(persona)
+    //La consigna dice que "PARA CADA PERSONA" ergo quiere recorrer una lista. CasaTurismo tiene una lista de personas
+    //que quieren acceder a un tour, entonces recorro esa lista y hago la venta.
+    fun ventaToursAPersonas(listaPersona: MutableList<Persona> ){
+        listaPersona.forEach { persona ->
+            val tourDisponible = tourBaratoDisponible(persona)
+            if(tourDisponible != null){
+                tourDisponible.agregarParticipante(persona)
+            }else{
+                agregarPersonaListaEspera(persona)      //Si no hay tour disponible, la agrego a la lista de espera
+            }
         }
     }
 
