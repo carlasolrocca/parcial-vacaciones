@@ -107,6 +107,7 @@ class Tour(
     }
 
     fun limiteParticipantesAlcanzado() : Boolean = participantesDelTour.size == cantidadPersonasRequerida
+    fun estaConfirmado() : Boolean = limiteParticipantesAlcanzado()
 }
 
 //La Casa de Turismo está a cargo del Armado de Tours
@@ -151,7 +152,7 @@ class CasaTurismo(){
 * */
 
 // *** PUNTO 4 ***
-//Para mi como el Admin confirma el Tour es el que tiene la lista de Observers
+//Como el Admin es quien confirma el Tour debe tener la lista de Observers
 class Administrador(){
     var listaObservers : MutableList<TourObserver> = mutableListOf()
 
@@ -175,12 +176,27 @@ class Administrador(){
     fun eliminarPersonaDelTour(persona : Persona, tour : Tour){
         tour.participantesDelTour.remove(persona)
     }
-
 }
 
-
+//Observers
 interface TourObserver {
     fun acciones(){} //Sin definir aun
 }
 
+class NotificacionMail() : TourObserver {}
+class NotificacionAFIP() : TourObserver {}
+class CambioPreferencia() : TourObserver {}
+
+interface MailSender {
+    fun sendMail(mail: Mail)
+}
+
+interface InformeAFIP {
+    fun sendInforme(informe: Informe)
+}
+
+//El content puede tener la info especifica del Tour
+data class Mail(val from : String, val to : String, val subject : String, val content : String)
+
+data class Informe(val from : String, val to : String, val codigos : List<Int>, val documentos : List<Int>)
 // *** FIN PUNTO 4 ***
