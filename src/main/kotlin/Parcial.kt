@@ -109,6 +109,7 @@ class Tour(
     fun limiteParticipantesAlcanzado() : Boolean = participantesDelTour.size == cantidadPersonasRequerida
     fun estaConfirmado() : Boolean = limiteParticipantesAlcanzado()
     fun fechaLimitePago() : LocalDate = fechaSalida.minusDays(30)
+    fun superaMontoAFIP() : Boolean = montoPagar > 1000000
 }
 
 //La Casa de Turismo está a cargo del Armado de Tours
@@ -148,9 +149,10 @@ class CasaTurismo(){
 // *** FIN PUNTO 3 ***
 
 /*
-* Aca está el diferencial del parcial de Vacaciones que decia Dodino: hay una confirmacion manual (la hace un administrador)
+* Aca está el diferencial del parcial de Vacaciones que decia Dodino:
+* hay una confirmacion manual (la hace un administrador)
 * y una acción asincronica (la hacen los observers) después de que se confirmo el Tour.
-* */
+*/
 
 // *** PUNTO 4 ***
 //Como el Admin es quien confirma el Tour debe tener la lista de Observers
@@ -167,6 +169,7 @@ class Administrador() {
 
     //Hay algo con las dependencias que no me gusta, pero no se como resolverlo
     fun confirmarTour(persona : Persona, tour : Tour) {
+        //Cuando confirma el Tour, hace algo más el Admin ademas de llamar a los observers?
         listaObservers.forEach { observer -> observer.accionesTourConfirmado(persona, tour) }
     }
 
@@ -200,17 +203,21 @@ class NotificacionMail(val mailSender : MailSender) : TourObserver {
 }
 class NotificacionAFIP(val informeAfip : InformeAFIP) : TourObserver {
     override fun accionesTourConfirmado(persona : Persona, tour : Tour) {
-        informeAfip.sendInforme(
-            Informe(
-                from = "agenciaviajesDodain@gmail.com",
-                to = "informes@arca.com.ar",
-                codigos = tour.lugaresTuristicos.map { it.codigoLugar },
-                documentos = tour.participantesDelTour.map { it.dni })
-        )
+        if(tour.superaMontoAFIP()){             //Solo si supera el monto, manda el informe
+            informeAfip.sendInforme(
+                Informe(
+                    from = "agenciaviajesDodain@gmail.com",
+                    to = "informes@arca.com.ar",
+                    codigos = tour.lugaresTuristicos.map { it.codigoLugar },
+                    documentos = tour.participantesDelTour.map { it.dni })
+            )
+        }
     }
 }
 class CambioPreferencia() : TourObserver {
-    override fun accionesTourConfirmado(persona : Persona, tour : Tour) {}
+    override fun accionesTourConfirmado(persona : Persona, tour : Tour) {
+
+    }
 }
 
 interface MailSender {
