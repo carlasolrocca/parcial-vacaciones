@@ -109,7 +109,7 @@ class Tour(
     fun limiteParticipantesAlcanzado() : Boolean = participantesDelTour.size == cantidadPersonasRequerida
     fun estaConfirmado() : Boolean = limiteParticipantesAlcanzado()
     fun fechaLimitePago() : LocalDate = fechaSalida.minusDays(30)
-    fun superaMontoAFIP() : Boolean = montoPagar > 1000000
+    fun superaMontoAFIP(monto : Double) : Boolean = montoPagar > monto
 }
 
 //La Casa de Turismo está a cargo del Armado de Tours
@@ -203,7 +203,8 @@ class NotificacionMail(val mailSender : MailSender) : TourObserver {
 }
 class NotificacionAFIP(val informeAfip : InformeAFIP) : TourObserver {
     override fun accionesTourConfirmado(persona : Persona, tour : Tour) {
-        if(tour.superaMontoAFIP()){             //Solo si supera el monto, manda el informe
+        val montoLimite = 10000000.0
+        if(tour.superaMontoAFIP(montoLimite)){             //Solo si supera el monto, manda el informe
             informeAfip.sendInforme(
                 Informe(
                     from = "agenciaviajesDodain@gmail.com",
@@ -216,7 +217,7 @@ class NotificacionAFIP(val informeAfip : InformeAFIP) : TourObserver {
 }
 class CambioPreferencia() : TourObserver {
     override fun accionesTourConfirmado(persona : Persona, tour : Tour) {
-
+        //No se resolverlo
     }
 }
 
