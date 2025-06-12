@@ -96,14 +96,17 @@ class Tour(
     val montoPagar : Double)
 {
     var participantesDelTour : MutableList<Persona> = mutableListOf() //hubiera hecho un map de persona+preferencia pero no se
+    lateinit var administradorDelTour : Administrador       //C/Tour tiene que tener su propio Admin, eso entiendo yo
 
     fun agregarParticipante(persona : Persona) {
-        participantesDelTour.add(persona)
-        cantidadPersonasRequerida -= 1
-        if(cantidadPersonasRequerida == 0) {
-            print("No entra nadie mas")
+        if (limiteParticipantesAlcanzado()) {
+            administradorDelTour.confirmarTour()            //PUNTO 4
+        }else{
+            participantesDelTour.add(persona)
         }
     }
+
+    fun limiteParticipantesAlcanzado() : Boolean = participantesDelTour.size == cantidadPersonasRequerida
 }
 
 //La Casa de Turismo está a cargo del Armado de Tours
@@ -114,7 +117,7 @@ class CasaTurismo(){
     //Auxiliar que me devuelve una lista de Tours cuyos lugares (todos) son aceptados por la persona
     fun toursLocacionesAceptadas(persona : Persona) : List<Tour> = toursDisponibles.filter{ tour -> persona.aceptaLugaresTour(tour) }
 
-    //Recibe a la persona y devuelve un tour que: cumpla con el presupuesto (menor valor posible) y que tenga lugares que acepta
+    //Recibe a la persona y devuelve UN tour que: cumpla con el presupuesto (menor valor posible) y que tenga lugares que acepta
     fun tourBaratoDisponible(persona : Persona) : Tour? = toursLocacionesAceptadas(persona).minByOrNull { it.montoPagar }
 
     private fun agregarPersonaListaEspera(persona: Persona) = listaEsperaPersonas.add(persona)
@@ -123,11 +126,24 @@ class CasaTurismo(){
     fun asignaTourAPersona(persona: Persona){
         val tourQueCumple = tourBaratoDisponible(persona)
         if(tourQueCumple == null){
-            agregarPersonaListaEspera(persona)                 //Si es null, va a lista espera
+            agregarPersonaListaEspera(persona)
         }else{
-            tourQueCumple.agregarParticipante(persona)      //Si no es null, lo agrega al tour
+            tourQueCumple.agregarParticipante(persona)
         }
     }
 
 }
 // *** FIN PUNTO 3 ***
+
+/*
+* Aca está el diferencial del parcial de Vacaciones que decia Dodino: hay una confirmacion manual (la hace un administrador)
+* y una acción asincronica (la hacen los observers) después de que se confirmo el Tour.
+* */
+
+// *** PUNTO 4 ***
+class Administrador(){
+
+    fun confirmarTour(){}
+}
+
+// *** FIN PUNTO 4 ***
