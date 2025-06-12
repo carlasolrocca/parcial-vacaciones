@@ -113,30 +113,34 @@ class Tour(
 class CasaTurismo(){
     var toursDisponibles : MutableList<Tour> = mutableListOf()           //La Casa de Turismo conoce a varios Tours
     var listaEsperaPersonas : MutableList<Persona> = mutableListOf()    //Lista de espera de personas que no pudieron acceder a un tour
-    var listaPersonas : MutableList<Persona> = mutableListOf()          //Lista de personas que quieren acceder a un tour
+
+    var listaPersonas : MutableList<Persona> = mutableListOf()          //Lista de personas que quieren comprar un tour
 
     //Filtra lista de Tours cuyos lugares (TODOS) son aceptados por la persona
     fun toursLocacionesAceptadas(persona : Persona) : List<Tour> = toursDisponibles.filter{ tour -> persona.aceptaLugaresTour(tour) }
 
-    //Filtra lista de Tours con el lugar + filtro de todos los que valgan menos que el presupuesto de la persona y agarra el MAS barato
+    //Filtra lista de Tours con el lugar + todos los que valgan menos que el presupuesto de la persona y agarra el MAS barato
     fun tourBaratoDisponible(persona : Persona) : Tour? = toursLocacionesAceptadas(persona)
         .filter { it.montoPagar <= persona.presupuestoMaximo }  //Lista con los que valen lo mismo o menos que el presupuesto
         .minByOrNull { it.montoPagar }                          //Agarra al + barato
 
-    private fun agregarPersonaListaEspera(persona: Persona) = listaEsperaPersonas.add(persona)
-
     //La consigna dice que "PARA CADA PERSONA" ergo quiere recorrer una lista. CasaTurismo tiene una lista de personas
     //que quieren acceder a un tour, entonces recorro esa lista y hago la venta.
-    fun ventaToursAPersonas(listaPersona: MutableList<Persona>){
-        listaPersona.forEach { persona ->
-            val tourDisponible = tourBaratoDisponible(persona)
-            if(tourDisponible != null){
-                tourDisponible.agregarParticipante(persona)
-            }else{
-                agregarPersonaListaEspera(persona)      //Si no hay tour disponible, la agrego a la lista de espera
-            }
+    fun ventaToursAPersonas(listaPersonas: MutableList<Persona>){
+        listaPersonas.forEach { persona -> validacionVentaTour(persona) }
+    }
+
+    //Abstraigo logica para validar si persona accede a un tour o va a lista espera
+    private fun validacionVentaTour(persona : Persona) {
+        val tourDisponible = tourBaratoDisponible(persona)
+        if(tourDisponible != null){
+            tourDisponible.agregarParticipante(persona)
+        }else{
+            agregarPersonaListaEspera(persona)      //Si no hay tour disponible, la agrego a la lista de espera
         }
     }
+
+    private fun agregarPersonaListaEspera(persona: Persona) = listaEsperaPersonas.add(persona)
 
 }
 // *** FIN PUNTO 3 ***
