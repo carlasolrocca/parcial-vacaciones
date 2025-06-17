@@ -19,7 +19,6 @@ abstract class Lugar(){
     abstract fun esTranquilo() : Boolean        //PUNTO 2
 }
 
-//Las atraccionesTuristicas podria ser var porque podria tener un metodo para agregar/sacar
 class Ciudad(var atraccionesTuristicas : MutableList<String>, val decibeles : Int) : Lugar(){
     override fun condicionDivertido(): Boolean = cantidadAtracciones() && cantidadHabitantes()
 
@@ -95,7 +94,7 @@ class Tour(
     val lugaresTuristicos : MutableList<Lugar>,
     val montoPagar : Double)
 {
-    var participantesDelTour : MutableList<Persona> = mutableListOf() //hubiera hecho un map de persona+preferencia pero no se
+    var participantesDelTour : MutableList<Persona> = mutableListOf()
     lateinit var administradorDelTour : Administrador               //C/Tour tiene que tener su propio Admin, eso entiendo yo
 
     fun agregarParticipante(persona : Persona) {
@@ -156,6 +155,7 @@ class CasaTurismo(){
 
 // *** PUNTO 4 ***
 //Como el Admin es quien confirma el Tour debe tener la lista de Observers
+// El Admin deberia conocer a la Casa de Turismo!!!!!! REHACER
 class Administrador() {
     var listaObservers: MutableList<TourObserver> = mutableListOf()
 
